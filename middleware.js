@@ -18,8 +18,8 @@ export default function middleware(request) {
   // ----------------------------------------------------
   // ▼ 在這裡設定您的內部專用帳號與密碼 (執行於主機端，絕對安全)
   // ----------------------------------------------------
-  const correctUser = 'admin';
-  const correctPwd = 'woodpassword'; 
+  const correctUser = 'yumu';
+  const correctPwd = 'wood'; 
 
   // 驗證比對
   if (user === correctUser && pwd === correctPwd) {
