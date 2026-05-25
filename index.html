@@ -17,7 +17,7 @@
             background-color: #ffffff;
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 15px; /* 手機版縮小邊距 */
             line-height: 1.5;
         }
         .container {
@@ -25,44 +25,55 @@
             margin: 0 auto;
         }
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        /* 頁籤切換 */
+        
+        /* 優化版頁籤切換：區塊按鈕化 */
         .tabs {
             display: flex;
-            gap: 20px;
+            gap: 10px;
             margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
         }
         .tab {
-            padding: 10px 4px;
+            flex: 1;
+            text-align: center;
+            padding: 12px 4px;
             cursor: pointer;
             color: var(--text-light);
-            border-bottom: 2px solid transparent;
+            background-color: var(--bg-hover);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.2s;
         }
         .tab.active {
-            color: var(--text-main);
-            border-bottom: 2px solid var(--text-main);
+            color: #fff;
+            background-color: var(--text-main);
+            border-color: var(--text-main);
             font-weight: 600;
         }
-        /* 輸入區塊 */
+
+        /* 輸入區塊優化：強制單行 */
         .input-group {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            gap: 5px; /* 縮小間距 */
             margin-bottom: 10px;
             align-items: center;
+            width: 100%;
         }
         input, select {
-            padding: 8px 12px;
+            padding: 8px 4px; /* 縮小內距讓出空間 */
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 14px;
             outline: none;
+            width: 100%; /* 配合 flex 使用 */
+            box-sizing: border-box;
         }
         input:focus, select:focus {
             border-color: #999;
@@ -71,43 +82,36 @@
             background-color: #fff;
             color: var(--text-main);
             border: 1px solid var(--border-color);
-            padding: 8px 16px;
+            padding: 8px 10px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
             transition: background 0.2s;
+            white-space: nowrap; /* 防止按鈕文字折行 */
         }
         button:hover {
             background-color: var(--bg-hover);
         }
-        .btn-primary {
-            background-color: var(--text-main);
-            color: #fff;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #000;
-        }
-        /* 雙按鈕顏色區分 */
-        .btn-green {
-            background-color: #2e7d32;
-            color: #fff;
-            border: none;
-            font-weight: 600;
-        }
-        .btn-green:hover { background-color: #1b5e20; }
         
-        .btn-blue {
-            background-color: #1976d2;
-            color: #fff;
-            border: none;
-            font-weight: 600;
+        /* 按鈕群組排版 */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
         }
+        
+        .btn-primary { background-color: var(--text-main); color: #fff; border: none; font-weight: 600;}
+        .btn-primary:hover { background-color: #000; }
+        .btn-green { background-color: #2e7d32; color: #fff; border: none; font-weight: 600;}
+        .btn-green:hover { background-color: #1b5e20; }
+        .btn-blue { background-color: #1976d2; color: #fff; border: none; font-weight: 600;}
         .btn-blue:hover { background-color: #0d47a1; }
+        .btn-delete { padding: 8px; flex-shrink: 0; color: #d32f2f; border-color: #e5e5e5; }
 
         /* 結果區塊公用 */
         .result-section {
-            margin-top: 30px;
+            margin-top: 25px;
             padding-top: 20px;
             border-top: 1px dashed var(--border-color);
         }
@@ -119,6 +123,7 @@
             margin-bottom: 20px;
             font-size: 14px;
         }
+        
         /* 角材 1D 視覺化 */
         .lumber-row {
             display: flex;
@@ -136,9 +141,10 @@
         }
         .lumber-multiplier {
             font-weight: 600;
-            min-width: 60px;
+            min-width: 50px;
             text-align: right;
             color: var(--text-main);
+            font-size: 14px;
         }
         .cut-piece {
             height: 100%;
@@ -152,11 +158,12 @@
             white-space: nowrap;
             box-sizing: border-box;
         }
+
         /* 板材 2D 視覺化 */
         .board-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-top: 20px;
         }
         .board-wrapper {
@@ -174,7 +181,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             box-sizing: border-box;
             overflow: hidden;
             text-align: center;
@@ -193,29 +200,16 @@
             align-items: flex-end;
             margin-bottom: 8px;
         }
-        .board-label {
-            font-weight: 600;
-            font-size: 15px;
-        }
-        .board-multiplier {
-            font-weight: bold;
-            font-size: 16px;
-            color: #d32f2f;
-        }
+        .board-label { font-weight: 600; font-size: 15px; }
+        .board-multiplier { font-weight: bold; font-size: 15px; color: #d32f2f; }
+
         /* 列印模式隱藏控制項與防切斷 */
         @media print {
             .no-print { display: none !important; }
             body { padding: 0; }
             .container { max-width: 100%; }
-            .board-container-box { 
-                page-break-inside: avoid; 
-                break-inside: avoid; 
-                margin-bottom: 40px !important;
-            }
-            .lumber-row { 
-                page-break-inside: avoid; 
-                break-inside: avoid; 
-            }
+            .board-container-box { page-break-inside: avoid; break-inside: avoid; margin-bottom: 40px !important; }
+            .lumber-row { page-break-inside: avoid; break-inside: avoid; }
         }
     </style>
 </head>
@@ -232,41 +226,40 @@
     <div id="board-section">
         <div class="no-print">
             <div style="margin-bottom: 15px;">
-                <label style="font-size: 14px; margin-right: 10px;">母材尺寸：</label>
-                <select id="board-type">
+                <select id="board-type" style="width: auto; margin-bottom: 5px;">
                     <option value="122,244">四八板 (122 × 244 cm)</option>
                     <option value="91.5,213.5">三七板 (91.5 × 213.5 cm)</option>
                 </select>
-                <span style="font-size: 12px; color: var(--text-light); margin-left: 10px;">*每次切割自動包含 6mm 耗損 (鋸片+誤差)</span>
+                <div style="font-size: 12px; color: var(--text-light);">*每次切割包含 6mm 耗損 (鋸片+誤差)</div>
             </div>
 
             <div id="board-inputs">
                 <div class="input-group">
-                    <input type="text" placeholder="名稱/用途 (例: 板一)" style="flex: 2; min-width: 120px;" value="板一">
-                    <input type="number" placeholder="長 (cm)" style="flex: 1; min-width: 70px;" value="100">
-                    <input type="number" placeholder="寬 (cm)" style="flex: 1; min-width: 70px;" value="100">
-                    <input type="number" placeholder="數量" style="flex: 1; min-width: 60px;" value="3">
-                    <button onclick="this.parentElement.remove()" style="padding: 8px;">✕</button>
+                    <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="板一">
+                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="100">
+                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="100">
+                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="3">
+                    <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
                 <div class="input-group">
-                    <input type="text" placeholder="名稱/用途 (例: 板二)" style="flex: 2; min-width: 120px;" value="板二">
-                    <input type="number" placeholder="長 (cm)" style="flex: 1; min-width: 70px;" value="120">
-                    <input type="number" placeholder="寬 (cm)" style="flex: 1; min-width: 70px;" value="40">
-                    <input type="number" placeholder="數量" style="flex: 1; min-width: 60px;" value="4">
-                    <button onclick="this.parentElement.remove()" style="padding: 8px;">✕</button>
+                    <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="板二">
+                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="120">
+                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="40">
+                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="4">
+                    <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
             </div>
 
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button onclick="addInputRow('board-inputs', true)">+ 新增板材需求</button>
-                <button class="btn-green" onclick="calculateBoard('waste')">▶ 開始計算 (最少損料)</button>
-                <button class="btn-blue" onclick="calculateBoard('cuts')">▶ 開始計算 (最少刀數)</button>
-                <button onclick="window.print()">🖨️ 列印 / 匯出 PDF</button>
+            <div class="action-buttons">
+                <button onclick="addInputRow('board-inputs', true)" style="flex: 1;">+ 新增</button>
+                <button class="btn-green" onclick="calculateBoard('waste')" style="flex: 1.5;">算損料</button>
+                <button class="btn-blue" onclick="calculateBoard('cuts')" style="flex: 1.5;">算刀數</button>
+                <button onclick="window.print()" style="flex: 1;">🖨️ 列印</button>
             </div>
         </div>
 
         <div id="board-result" class="result-section" style="display: none;">
-            <h2 style="font-size: 18px;">板材切割圖紙</h2>
+            <h2 style="font-size: 18px; margin-top:0;">板材切割圖紙</h2>
             <div id="board-summary" class="summary-box"></div>
             <div id="board-visuals" class="board-grid"></div>
         </div>
@@ -275,32 +268,31 @@
     <div id="lumber-section" style="display: none;">
         <div class="no-print">
             <div style="margin-bottom: 15px;">
-                <label style="font-size: 14px; margin-right: 10px;">母材長度：</label>
-                <select id="lumber-type">
+                <select id="lumber-type" style="width: auto; margin-bottom: 5px;">
                     <option value="305">十尺 (305 cm)</option>
                     <option value="366">十二尺 (366 cm)</option>
                 </select>
-                <span style="font-size: 12px; color: var(--text-light); margin-left: 10px;">*每次切割自動扣除 3mm 鋸片損耗</span>
+                <div style="font-size: 12px; color: var(--text-light);">*每次切割自動扣除 3mm 鋸片損耗</div>
             </div>
 
             <div id="lumber-inputs">
                 <div class="input-group">
-                    <input type="text" placeholder="名稱/用途 (例: 主結構)" style="flex: 2; min-width: 150px;">
-                    <input type="number" placeholder="長度 (cm)" style="flex: 1; min-width: 80px;" value="210">
-                    <input type="number" placeholder="數量" style="flex: 1; min-width: 60px;" value="15">
-                    <button onclick="this.parentElement.remove()" style="padding: 8px;">✕</button>
+                    <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="主結構">
+                    <input type="number" placeholder="長度" style="flex: 1.5; min-width: 0;" value="210">
+                    <input type="number" placeholder="數量" style="flex: 1; min-width: 0;" value="15">
+                    <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
             </div>
 
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button onclick="addInputRow('lumber-inputs', false)">+ 新增角材需求</button>
-                <button class="btn-primary" onclick="calculateLumber()">開始計算角材</button>
-                <button onclick="window.print()">🖨️ 列印 / 匯出 PDF</button>
+            <div class="action-buttons">
+                <button onclick="addInputRow('lumber-inputs', false)" style="flex: 1;">+ 新增</button>
+                <button class="btn-primary" onclick="calculateLumber()" style="flex: 2;">開始計算</button>
+                <button onclick="window.print()" style="flex: 1;">🖨️ 列印</button>
             </div>
         </div>
 
         <div id="lumber-result" class="result-section" style="display: none;">
-            <h2 style="font-size: 18px;">角材叫貨清單與切割圖</h2>
+            <h2 style="font-size: 18px; margin-top:0;">角材叫貨清單與切割圖</h2>
             <div id="lumber-summary" class="summary-box"></div>
             <div id="lumber-visuals" style="margin-top: 20px;"></div>
         </div>
@@ -323,25 +315,25 @@
         }
     }
 
-    // 動態新增輸入列
+    // 動態新增輸入列 (對應新的單行 CSS 比例)
     function addInputRow(containerId, isBoard) {
         const container = document.getElementById(containerId);
         const div = document.createElement('div');
         div.className = 'input-group';
         if(isBoard) {
             div.innerHTML = `
-                <input type="text" placeholder="名稱/用途" style="flex: 2; min-width: 120px;">
-                <input type="number" placeholder="長 (cm)" style="flex: 1; min-width: 70px;">
-                <input type="number" placeholder="寬 (cm)" style="flex: 1; min-width: 70px;">
-                <input type="number" placeholder="數量" style="flex: 1; min-width: 60px;" value="1">
-                <button onclick="this.parentElement.remove()" style="padding: 8px;">✕</button>
+                <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;">
+                <input type="number" placeholder="長" style="flex: 1; min-width: 0;">
+                <input type="number" placeholder="寬" style="flex: 1; min-width: 0;">
+                <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="1">
+                <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
             `;
         } else {
             div.innerHTML = `
-                <input type="text" placeholder="名稱/用途" style="flex: 2; min-width: 150px;">
-                <input type="number" placeholder="長度 (cm)" style="flex: 1; min-width: 80px;">
-                <input type="number" placeholder="數量" style="flex: 1; min-width: 60px;" value="1">
-                <button onclick="this.parentElement.remove()" style="padding: 8px;">✕</button>
+                <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;">
+                <input type="number" placeholder="長度" style="flex: 1.5; min-width: 0;">
+                <input type="number" placeholder="數量" style="flex: 1; min-width: 0;" value="1">
+                <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
             `;
         }
         container.appendChild(div);
@@ -359,7 +351,7 @@
         const stockType = document.getElementById('lumber-type');
         const stockLength = parseFloat(stockType.value);
         const stockName = stockType.options[stockType.selectedIndex].text;
-        const sawLoss = 0.3; // 3mm 損耗
+        const sawLoss = 0.3; 
         
         let requests = [];
         let reqSummaryText = [];
@@ -416,11 +408,11 @@
 
         document.getElementById('lumber-result').style.display = 'block';
         summaryContainer.innerHTML = `
-            <strong>【輸入條件核對】</strong><br>
-            母材規格：${stockName}<br>
-            切割需求：${reqSummaryText.join('、')}<br>
+            <strong>【條件核對】</strong><br>
+            母材：${stockName}<br>
+            需求：${reqSummaryText.join('、')}<br>
             <br>
-            <strong style="font-size:16px; color:#d32f2f;">總共需要叫貨： ${stocks.length} 支</strong>
+            <strong style="font-size:16px; color:#d32f2f;">總共需叫貨： ${stocks.length} 支</strong>
         `;
         
         Object.values(groupedStocks).forEach(group => {
@@ -457,7 +449,7 @@
 
             const multiplier = document.createElement('div');
             multiplier.className = 'lumber-multiplier';
-            multiplier.innerText = `× ${count} 組`;
+            multiplier.innerText = `× ${count}`;
 
             rowWrapper.appendChild(barContainer);
             rowWrapper.appendChild(multiplier);
@@ -479,7 +471,7 @@
         const boardH = parseFloat(boardType[1]);
         const boardName = document.getElementById('board-type').options[document.getElementById('board-type').selectedIndex].text;
         
-        const loss = 0.6; // 6mm 耗損
+        const loss = 0.6;
         const vBoardW = boardW + loss;
         const vBoardH = boardH + loss;
 
@@ -518,7 +510,6 @@
         if(hasError) return;
         if(requests.length === 0) return alert("請輸入至少一筆有效的板材需求");
 
-        // 依據不同模式進行排序演算法
         if (mode === 'cuts') {
             requests.sort((a, b) => {
                 let maxA = a.l;
@@ -587,7 +578,6 @@
             }
         });
 
-        // 針對排版結果進行分組計算
         let groupedBoards = {};
         boards.forEach(board => {
             let sigArr = board.rects.map(r => `${r.name}:${r.originalL}x${r.originalW}@${Math.round(r.x*10)}_${Math.round(r.y*10)}`);
@@ -601,23 +591,21 @@
             }
         });
 
-        // 輸出結果 (加入大字號計算模式標示)
-        let modeLabel = mode === 'cuts' ? '最少刀數 (優先直線長切)' : '最少損料 (優先面積填滿)';
-        let modeColor = mode === 'cuts' ? '#1976d2' : '#2e7d32'; // 顏色對應按鈕
+        let modeLabel = mode === 'cuts' ? '最少刀數 (直線長切)' : '最少損料 (面積填滿)';
+        let modeColor = mode === 'cuts' ? '#1976d2' : '#2e7d32'; 
 
         document.getElementById('board-result').style.display = 'block';
         summaryContainer.innerHTML = `
-            <div style="font-size: 20px; font-weight: 900; color: ${modeColor}; margin-bottom: 15px; border-bottom: 2px solid ${modeColor}; padding-bottom: 5px; display: inline-block;">
-                📐 計算模式：${modeLabel}
+            <div style="font-size: 18px; font-weight: 900; color: ${modeColor}; margin-bottom: 10px; border-bottom: 2px solid ${modeColor}; padding-bottom: 5px; display: inline-block;">
+                📐 ${modeLabel}
             </div><br>
-            <strong>【輸入條件核對】</strong><br>
-            母板規格：${boardName}<br>
-            切割需求：${reqSummaryText.join('、')}<br>
+            <strong>【條件核對】</strong><br>
+            母板：${boardName}<br>
+            需求：${reqSummaryText.join('、')}<br>
             <br>
-            <strong style="font-size:16px; color:#d32f2f;">總共需要叫貨： ${boards.length} 張板材</strong>
+            <strong style="font-size:16px; color:#d32f2f;">總共需叫貨： ${boards.length} 張板材</strong>
         `;
 
-        // 繪製分組後的圖紙
         let displayIndex = 1;
         Object.values(groupedBoards).forEach(group => {
             const board = group.board;
@@ -631,7 +619,7 @@
             
             const label = document.createElement('div');
             label.className = 'board-label';
-            label.innerText = `切割圖樣 #${displayIndex++}`;
+            label.innerText = `圖樣 #${displayIndex++}`;
             
             const multiplier = document.createElement('div');
             multiplier.className = 'board-multiplier';
@@ -660,12 +648,11 @@
                 piece.style.width = `${widthPct}%`;
                 piece.style.height = `${heightPct}%`;
                 
-                // 【核心修正】安全判斷是否旋轉，精準顯示長寬
                 let isRotated = Math.abs(rect.drawW - rect.l) < 0.01;
                 let displayW = isRotated ? rect.originalL : rect.originalW;
                 let displayH = isRotated ? rect.originalW : rect.originalL;
 
-                piece.innerHTML = `<strong>${rect.name}</strong><span>${displayW} x ${displayH}</span>`;
+                piece.innerHTML = `<strong>${rect.name}</strong><span>${displayW}x${displayH}</span>`;
                 boardDiv.appendChild(piece);
             });
 
