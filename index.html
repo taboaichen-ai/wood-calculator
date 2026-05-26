@@ -76,9 +76,6 @@
         .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
         .board-label { font-weight: 600; font-size: 15px; }
         .board-multiplier { font-weight: bold; font-size: 15px; color: #d32f2f; }
-        
-        /* 詳細座標資訊樣式 */
-        .detail-text { font-size: 10px; color: #666; margin-top: 4px; line-height: 1.2; background-color: rgba(255,255,255,0.8); padding: 2px 4px; border-radius: 4px; }
 
         @media print {
             .no-print { display: none !important; }
@@ -109,22 +106,22 @@
                     <option value="122,244">四八板 (122 × 244 cm)</option>
                     <option value="91.5,213.5">三七板 (91.5 × 213.5 cm)</option>
                 </select>
-                <div style="font-size: 12px; color: var(--text-light);">*每次切割包含 6mm 耗損 (鋸片+誤差)</div>
+                <div style="font-size: 12px; color: var(--text-light);">*每次切割包含 4mm 耗損 (鋸片+誤差)</div>
             </div>
 
             <div id="board-inputs">
                 <div class="input-group">
                     <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="板一">
-                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="100">
-                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="100">
-                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="3">
+                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="169">
+                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="40">
+                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="6">
                     <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
                 <div class="input-group">
                     <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="板二">
-                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="120">
-                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="40">
-                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="4">
+                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="40">
+                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="36">
+                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="15">
                     <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
             </div>
@@ -147,7 +144,7 @@
         </div>
 
         <div id="board-result" class="result-section" style="display: none;">
-            <h2 style="font-size: 18px; margin-top:0;">板材切割圖紙 (附落點座標)</h2>
+            <h2 style="font-size: 18px; margin-top:0;">板材切割圖紙</h2>
             <div id="board-summary" class="summary-box"></div>
             <div id="board-visuals" class="board-grid"></div>
         </div>
@@ -231,7 +228,6 @@
     }
 
     function calculateLumber() {
-        // (角材計算邏輯保持不變)
         const visualContainer = document.getElementById('lumber-visuals');
         const summaryContainer = document.getElementById('lumber-summary');
         visualContainer.innerHTML = ''; summaryContainer.innerHTML = '';
@@ -307,7 +303,7 @@
     }
 
     // ==========================================
-    // 2D 板材計算邏輯 (新增座標標示功能)
+    // 2D 板材計算邏輯 (導入推台鋸 Strip Packing 邏輯)
     // ==========================================
     function calculateBoard(mode) {
         const visualContainer = document.getElementById('board-visuals');
@@ -320,7 +316,7 @@
         const boardH = parseFloat(boardType[1]);
         const boardName = document.getElementById('board-type').options[document.getElementById('board-type').selectedIndex].text;
         
-        const loss = 0.6;
+        const loss = 0.4; // 耗損改為 4mm
         const vBoardW = boardW + loss;
         const vBoardH = boardH + loss;
 
@@ -359,14 +355,19 @@
         if(hasError) return;
         if(requests.length === 0) return alert("請輸入至少一筆有效的板材需求");
 
+        // 排序演算法優化
         if (mode === 'cuts') {
+            // 最少刀數：以最大邊優先，再以最小邊排列 (幫助系統自動找到可以組合成長條的板材)
             requests.sort((a, b) => {
-                let maxA = a.l;
-                let maxB = b.l;
+                let maxA = Math.max(a.l, a.w);
+                let maxB = Math.max(b.l, b.w);
                 if (maxB !== maxA) return maxB - maxA;
-                return (b.l * b.w) - (a.l * a.w);
+                let minA = Math.min(a.l, a.w);
+                let minB = Math.min(b.l, b.w);
+                return minB - minA;
             });
         } else {
+            // 最少損料：面積優先
             requests.sort((a, b) => (b.l * b.w) - (a.l * a.w));
         }
 
@@ -384,23 +385,50 @@
             }
         }
 
-        function splitNode(node, w, h) {
+        function splitNode(node, w, h, mode) {
             node.used = true;
+            
+            let canFitNormal = w <= node.w && h <= node.h;
+            let canFitRotated = h <= node.w && w <= node.h;
             let fitW = w, fitH = h;
-            if (w > node.w || h > node.h) {
+            
+            // 最佳轉向判定：如果兩個方向都放得下，優先選擇能「切齊母板剩餘邊界」的方向
+            if (canFitNormal && canFitRotated) {
+                if (Math.abs(w - node.w) < 0.01 || Math.abs(h - node.h) < 0.01) { fitW = w; fitH = h; }
+                else if (Math.abs(h - node.w) < 0.01 || Math.abs(w - node.h) < 0.01) { fitW = h; fitH = w; }
+                else {
+                    if ((w >= h && node.w >= node.h) || (h > w && node.h > node.w)) { fitW = w; fitH = h; }
+                    else { fitW = h; fitH = w; }
+                }
+            } else if (canFitRotated) {
                 fitW = h; fitH = w;
             }
 
             let dw = node.w - fitW;
             let dh = node.h - fitH;
 
-            if (dw > dh) {
-                node.down = { x: node.x, y: node.y + fitH, w: fitW, h: dh, used: false };
-                node.right = { x: node.x + fitW, y: node.y, w: dw, h: node.h, used: false };
+            // 核心修改：推台鋸切割邏輯 (Guillotine cut heuristic)
+            if (mode === 'cuts') {
+                // 如果放進去的物件是「窄長型 (高 > 寬)」，我們就讓切割線一刀往下切到底 (形成垂直長條)
+                // 如果是「寬扁型 (寬 > 高)」，就一刀橫切到底 (形成水平長條)
+                if (fitW < fitH) {
+                    node.down = { x: node.x, y: node.y + fitH, w: fitW, h: dh, used: false };
+                    node.right = { x: node.x + fitW, y: node.y, w: dw, h: node.h, used: false };
+                } else {
+                    node.down = { x: node.x, y: node.y + fitH, w: node.w, h: dh, used: false };
+                    node.right = { x: node.x + fitW, y: node.y, w: dw, h: fitH, used: false };
+                }
             } else {
-                node.down = { x: node.x, y: node.y + fitH, w: node.w, h: dh, used: false };
-                node.right = { x: node.x + fitW, y: node.y, w: dw, h: fitH, used: false };
+                // 傳統保留最大剩餘完整區塊的切法 (易產生畸零切線)
+                if (dw > dh) {
+                    node.down = { x: node.x, y: node.y + fitH, w: fitW, h: dh, used: false };
+                    node.right = { x: node.x + fitW, y: node.y, w: dw, h: node.h, used: false };
+                } else {
+                    node.down = { x: node.x, y: node.y + fitH, w: node.w, h: dh, used: false };
+                    node.right = { x: node.x + fitW, y: node.y, w: dw, h: fitH, used: false };
+                }
             }
+            
             return { x: node.x, y: node.y, w: fitW, h: fitH };
         }
 
@@ -409,7 +437,7 @@
             for (let i = 0; i < boards.length; i++) {
                 let node = findNode(boards[i].root, req.w, req.l);
                 if (node) {
-                    let rect = splitNode(node, req.w, req.l);
+                    let rect = splitNode(node, req.w, req.l, mode); // 傳入模式
                     boards[i].rects.push({ ...req, x: rect.x, y: rect.y, drawW: rect.w, drawH: rect.h });
                     placed = true;
                     break;
@@ -421,7 +449,7 @@
                     rects: []
                 };
                 let node = findNode(newBoard.root, req.w, req.l);
-                let rect = splitNode(node, req.w, req.l);
+                let rect = splitNode(node, req.w, req.l, mode);
                 newBoard.rects.push({ ...req, x: rect.x, y: rect.y, drawW: rect.w, drawH: rect.h });
                 boards.push(newBoard);
             }
@@ -442,7 +470,6 @@
 
         let modeLabel = mode === 'cuts' ? '最少刀數 (直線長切)' : '最少損料 (面積填滿)';
         let modeColor = mode === 'cuts' ? '#1976d2' : '#2e7d32'; 
-
         let rulerIcon = `<svg class="icon" viewBox="0 0 24 24" style="margin-right: 8px;"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg>`;
 
         document.getElementById('board-result').style.display = 'block';
@@ -503,15 +530,8 @@
                 let displayW = isRotated ? rect.originalL : rect.originalW;
                 let displayH = isRotated ? rect.originalW : rect.originalL;
 
-                // 核心更新：加入座標與含耗損尺寸顯示
-                piece.innerHTML = `
-                    <strong>${rect.name}</strong>
-                    <span style="font-size:14px; font-weight:600;">${displayW} x ${displayH}</span>
-                    <div class="detail-text">
-                        刀距: ${rect.drawW}x${rect.drawH}<br>
-                        X:${rect.x.toFixed(1)} Y:${rect.y.toFixed(1)}
-                    </div>
-                `;
+                // 移除刀距與 X/Y 座標文字
+                piece.innerHTML = `<strong>${rect.name}</strong><span style="font-size:14px; font-weight:600;">${displayW} x ${displayH}</span>`;
                 boardDiv.appendChild(piece);
             });
 
