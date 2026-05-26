@@ -25,7 +25,7 @@
             margin: 0 auto;
         }
         
-        /* --- 向量圖示 (SVG) 共用樣式 --- */
+        /* --- 向量圖示 (SVG) --- */
         .icon {
             display: inline-block;
             width: 1.2em;
@@ -38,199 +38,48 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
-        .icon-title {
-            width: 1.4em;
-            height: 1.4em;
-            vertical-align: middle;
-            stroke: #795548; /* 木頭色 */
-            margin-right: 8px;
-        }
+        .icon-title { width: 1.4em; height: 1.4em; vertical-align: middle; stroke: #795548; margin-right: 8px; }
 
-        h1 {
-            font-size: 22px;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
+        h1 { font-size: 22px; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center; }
         
-        /* 區塊按鈕化頁籤 */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px 4px;
-            cursor: pointer;
-            color: var(--text-light);
-            background-color: var(--bg-hover);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 15px;
-            transition: all 0.2s;
-        }
-        .tab.active {
-            color: #fff;
-            background-color: var(--text-main);
-            border-color: var(--text-main);
-            font-weight: 600;
-        }
+        /* 頁籤 */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; text-align: center; padding: 12px 4px; cursor: pointer; color: var(--text-light); background-color: var(--bg-hover); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 500; font-size: 15px; transition: all 0.2s; }
+        .tab.active { color: #fff; background-color: var(--text-main); border-color: var(--text-main); font-weight: 600; }
 
-        /* 輸入區塊：單行 */
-        .input-group {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-            align-items: center;
-            width: 100%;
-        }
-        input, select {
-            padding: 8px 4px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        input:focus, select:focus {
-            border-color: #999;
-        }
-        button {
-            background-color: #fff;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 8px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        button:hover {
-            background-color: var(--bg-hover);
-        }
+        /* 輸入區塊 */
+        .input-group { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; width: 100%; }
+        input, select { padding: 8px 4px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #999; }
+        button { background-color: #fff; color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.2s; white-space: nowrap; display: flex; align-items: center; justify-content: center; }
+        button:hover { background-color: var(--bg-hover); }
         
-        /* 按鈕群組 */
-        .action-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 15px;
-        }
-        
+        .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
         .btn-primary { background-color: var(--text-main); color: #fff; border: none; font-weight: 600;}
-        .btn-primary:hover { background-color: #000; }
         .btn-green { background-color: #2e7d32; color: #fff; border: none; font-weight: 600;}
-        .btn-green:hover { background-color: #1b5e20; }
         .btn-blue { background-color: #1976d2; color: #fff; border: none; font-weight: 600;}
-        .btn-blue:hover { background-color: #0d47a1; }
         .btn-delete { padding: 8px; flex-shrink: 0; color: #d32f2f; border-color: #e5e5e5; }
 
-        /* 結果區塊公用 */
-        .result-section {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px dashed var(--border-color);
-        }
-        .summary-box {
-            background-color: var(--bg-hover);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
+        .result-section { margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border-color); }
+        .summary-box { background-color: var(--bg-hover); border: 1px solid var(--border-color); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
         
-        /* 角材 1D 視覺化 */
-        .lumber-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            gap: 10px;
-        }
-        .lumber-bar-container {
-            flex: 1;
-            height: 40px;
-            background-color: var(--bg-hover);
-            border: 2px solid var(--text-main); 
-            display: flex;
-            position: relative;
-        }
-        .lumber-multiplier {
-            font-weight: 600;
-            min-width: 50px;
-            text-align: right;
-            color: var(--text-main);
-            font-size: 14px;
-        }
-        .cut-piece {
-            height: 100%;
-            border-right: 1px solid var(--text-main);
-            background-color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            overflow: hidden;
-            white-space: nowrap;
-            box-sizing: border-box;
-        }
+        /* 角材 1D */
+        .lumber-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
+        .lumber-bar-container { flex: 1; height: 40px; background-color: var(--bg-hover); border: 2px solid var(--text-main); display: flex; position: relative; }
+        .lumber-multiplier { font-weight: 600; min-width: 50px; text-align: right; color: var(--text-main); font-size: 14px; }
+        .cut-piece { height: 100%; border-right: 1px solid var(--text-main); background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; white-space: nowrap; box-sizing: border-box; }
 
-        /* 板材 2D 視覺化 */
-        .board-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-        .board-wrapper {
-            border: 2px solid var(--text-main);
-            background-color: var(--bg-hover);
-            position: relative;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .board-piece {
-            position: absolute;
-            border: 1px solid var(--text-main);
-            background-color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            box-sizing: border-box;
-            overflow: hidden;
-            text-align: center;
-            padding: 2px;
-        }
-        .board-piece strong {
-            display: block;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .board-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 8px;
-        }
+        /* 板材 2D */
+        .board-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-top: 20px; }
+        .board-wrapper { border: 2px solid var(--text-main); background-color: var(--bg-hover); position: relative; width: 100%; box-sizing: border-box; }
+        .board-piece { position: absolute; border: 1px solid var(--text-main); background-color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; box-sizing: border-box; overflow: hidden; text-align: center; padding: 2px; }
+        .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
         .board-label { font-weight: 600; font-size: 15px; }
         .board-multiplier { font-weight: bold; font-size: 15px; color: #d32f2f; }
+        
+        /* 詳細座標資訊樣式 */
+        .detail-text { font-size: 10px; color: #666; margin-top: 4px; line-height: 1.2; background-color: rgba(255,255,255,0.8); padding: 2px 4px; border-radius: 4px; }
 
-        /* 列印模式 */
         @media print {
             .no-print { display: none !important; }
             body { padding: 0; }
@@ -244,11 +93,7 @@
 
 <div class="container">
     <h1 class="no-print">
-        <svg class="icon icon-title" viewBox="0 0 24 24">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-            <line x1="12" y1="22.08" x2="12" y2="12"></line>
-        </svg>
+        <svg class="icon icon-title" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
         木工裁切計算板
     </h1>
     
@@ -287,11 +132,11 @@
             <div class="action-buttons">
                 <button onclick="addInputRow('board-inputs', true)" style="flex: 1;">+ 新增</button>
                 <button class="btn-green" onclick="calculateBoard('waste')" style="flex: 1.5;">
-                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>
+                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line></svg>
                     最少損料
                 </button>
                 <button class="btn-blue" onclick="calculateBoard('cuts')" style="flex: 1.5;">
-                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>
+                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line></svg>
                     最少刀數
                 </button>
                 <button onclick="window.print()" style="flex: 1;">
@@ -302,7 +147,7 @@
         </div>
 
         <div id="board-result" class="result-section" style="display: none;">
-            <h2 style="font-size: 18px; margin-top:0;">板材切割圖紙</h2>
+            <h2 style="font-size: 18px; margin-top:0;">板材切割圖紙 (附落點座標)</h2>
             <div id="board-summary" class="summary-box"></div>
             <div id="board-visuals" class="board-grid"></div>
         </div>
@@ -330,7 +175,7 @@
             <div class="action-buttons">
                 <button onclick="addInputRow('lumber-inputs', false)" style="flex: 1;">+ 新增</button>
                 <button class="btn-primary" onclick="calculateLumber()" style="flex: 2;">
-                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>
+                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line></svg>
                     開始計算
                 </button>
                 <button onclick="window.print()" style="flex: 1;">
@@ -350,11 +195,9 @@
 </div>
 
 <script>
-    // 頁籤切換
     function switchTab(tab) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-' + tab).classList.add('active');
-        
         if(tab === 'lumber') {
             document.getElementById('lumber-section').style.display = 'block';
             document.getElementById('board-section').style.display = 'none';
@@ -364,7 +207,6 @@
         }
     }
 
-    // 動態新增輸入列
     function addInputRow(containerId, isBoard) {
         const container = document.getElementById(containerId);
         const div = document.createElement('div');
@@ -388,40 +230,31 @@
         container.appendChild(div);
     }
 
-    // ==========================================
-    // 1D 角材計算邏輯
-    // ==========================================
     function calculateLumber() {
+        // (角材計算邏輯保持不變)
         const visualContainer = document.getElementById('lumber-visuals');
         const summaryContainer = document.getElementById('lumber-summary');
-        visualContainer.innerHTML = '';
-        summaryContainer.innerHTML = '';
+        visualContainer.innerHTML = ''; summaryContainer.innerHTML = '';
         
         const stockType = document.getElementById('lumber-type');
         const stockLength = parseFloat(stockType.value);
         const stockName = stockType.options[stockType.selectedIndex].text;
         const sawLoss = 0.3; 
         
-        let requests = [];
-        let reqSummaryText = [];
-        
+        let requests = []; let reqSummaryText = [];
         const rows = document.querySelectorAll('#lumber-inputs .input-group');
         rows.forEach(row => {
             const inputs = row.querySelectorAll('input');
             const name = inputs[0].value || '未命名';
             const length = parseFloat(inputs[1].value);
             const qty = parseInt(inputs[2].value);
-            
             if (length > 0 && qty > 0) {
                 reqSummaryText.push(`${name}(${length}cm) × ${qty}`);
-                for (let i = 0; i < qty; i++) {
-                    requests.push({ name, length });
-                }
+                for (let i = 0; i < qty; i++) requests.push({ name, length });
             }
         });
 
         if(requests.length === 0) return alert("請輸入至少一筆有效的角材需求");
-
         requests.sort((a, b) => b.length - a.length);
 
         let stocks = [];
@@ -432,82 +265,49 @@
                 if (stocks[i].remaining >= requiredSpace) {
                     stocks[i].cuts.push(req);
                     stocks[i].remaining -= requiredSpace;
-                    placed = true;
-                    break;
+                    placed = true; break;
                 }
             }
-            if (!placed) {
-                stocks.push({
-                    totalLength: stockLength,
-                    remaining: stockLength - req.length,
-                    cuts: [req]
-                });
-            }
+            if (!placed) stocks.push({ totalLength: stockLength, remaining: stockLength - req.length, cuts: [req] });
         });
 
         let groupedStocks = {};
         stocks.forEach(stock => {
             let signature = stock.cuts.map(c => `${c.name}:${c.length}`).join('|');
-            if(!groupedStocks[signature]) {
-                groupedStocks[signature] = { stock: stock, count: 1 };
-            } else {
-                groupedStocks[signature].count++;
-            }
+            if(!groupedStocks[signature]) groupedStocks[signature] = { stock: stock, count: 1 };
+            else groupedStocks[signature].count++;
         });
 
         document.getElementById('lumber-result').style.display = 'block';
-        summaryContainer.innerHTML = `
-            <strong>【條件核對】</strong><br>
-            母材：${stockName}<br>
-            需求：${reqSummaryText.join('、')}<br>
-            <br>
-            <strong style="font-size:16px; color:#d32f2f;">總共需叫貨： ${stocks.length} 支${stockName}</strong>
-        `;
+        summaryContainer.innerHTML = `<strong>【條件核對】</strong><br>母材：${stockName}<br>需求：${reqSummaryText.join('、')}<br><br><strong style="font-size:16px; color:#d32f2f;">總共需叫貨： ${stocks.length} 支${stockName}</strong>`;
         
         Object.values(groupedStocks).forEach(group => {
             const stock = group.stock;
             const count = group.count;
-            
-            const rowWrapper = document.createElement('div');
-            rowWrapper.className = 'lumber-row';
-            
-            const barContainer = document.createElement('div');
-            barContainer.className = 'lumber-bar-container';
+            const rowWrapper = document.createElement('div'); rowWrapper.className = 'lumber-row';
+            const barContainer = document.createElement('div'); barContainer.className = 'lumber-bar-container';
             
             stock.cuts.forEach(cut => {
                 const percentage = (cut.length / stockLength) * 100;
-                const piece = document.createElement('div');
-                piece.className = 'cut-piece';
-                piece.style.width = `${percentage}%`;
-                piece.innerText = `${cut.name} (${cut.length})`;
+                const piece = document.createElement('div'); piece.className = 'cut-piece';
+                piece.style.width = `${percentage}%`; piece.innerText = `${cut.name} (${cut.length})`;
                 barContainer.appendChild(piece);
             });
 
             if (stock.remaining > 0) {
                 const remPercentage = (stock.remaining / stockLength) * 100;
                 const rem = document.createElement('div');
-                rem.style.width = `${remPercentage}%`;
-                rem.style.display = 'flex';
-                rem.style.alignItems = 'center';
-                rem.style.justifyContent = 'center';
-                rem.style.fontSize = '12px';
-                rem.style.color = 'var(--text-light)';
-                rem.innerText = `餘 ${stock.remaining.toFixed(1)}`;
-                barContainer.appendChild(rem);
+                rem.style.width = `${remPercentage}%`; rem.style.display = 'flex'; rem.style.alignItems = 'center'; rem.style.justifyContent = 'center'; rem.style.fontSize = '12px'; rem.style.color = 'var(--text-light)';
+                rem.innerText = `餘 ${stock.remaining.toFixed(1)}`; barContainer.appendChild(rem);
             }
 
-            const multiplier = document.createElement('div');
-            multiplier.className = 'lumber-multiplier';
-            multiplier.innerText = `× ${count}`;
-
-            rowWrapper.appendChild(barContainer);
-            rowWrapper.appendChild(multiplier);
-            visualContainer.appendChild(rowWrapper);
+            const multiplier = document.createElement('div'); multiplier.className = 'lumber-multiplier'; multiplier.innerText = `× ${count}`;
+            rowWrapper.appendChild(barContainer); rowWrapper.appendChild(multiplier); visualContainer.appendChild(rowWrapper);
         });
     }
 
     // ==========================================
-    // 2D 板材計算邏輯
+    // 2D 板材計算邏輯 (新增座標標示功能)
     // ==========================================
     function calculateBoard(mode) {
         const visualContainer = document.getElementById('board-visuals');
@@ -520,7 +320,7 @@
         const boardH = parseFloat(boardType[1]);
         const boardName = document.getElementById('board-type').options[document.getElementById('board-type').selectedIndex].text;
         
-        const loss = 0.4;
+        const loss = 0.6;
         const vBoardW = boardW + loss;
         const vBoardH = boardH + loss;
 
@@ -643,7 +443,6 @@
         let modeLabel = mode === 'cuts' ? '最少刀數 (直線長切)' : '最少損料 (面積填滿)';
         let modeColor = mode === 'cuts' ? '#1976d2' : '#2e7d32'; 
 
-        // 包含 SVG 直尺圖示
         let rulerIcon = `<svg class="icon" viewBox="0 0 24 24" style="margin-right: 8px;"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg>`;
 
         document.getElementById('board-result').style.display = 'block';
@@ -704,7 +503,15 @@
                 let displayW = isRotated ? rect.originalL : rect.originalW;
                 let displayH = isRotated ? rect.originalW : rect.originalL;
 
-                piece.innerHTML = `<strong>${rect.name}</strong><span>${displayW}x${displayH}</span>`;
+                // 核心更新：加入座標與含耗損尺寸顯示
+                piece.innerHTML = `
+                    <strong>${rect.name}</strong>
+                    <span style="font-size:14px; font-weight:600;">${displayW} x ${displayH}</span>
+                    <div class="detail-text">
+                        刀距: ${rect.drawW}x${rect.drawH}<br>
+                        X:${rect.x.toFixed(1)} Y:${rect.y.toFixed(1)}
+                    </div>
+                `;
                 boardDiv.appendChild(piece);
             });
 
