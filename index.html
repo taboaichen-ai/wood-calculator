@@ -20,34 +20,17 @@
             padding: 15px;
             line-height: 1.5;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+        .container { max-width: 900px; margin: 0 auto; }
         
-        /* --- 向量圖示 (SVG) --- */
-        .icon {
-            display: inline-block;
-            width: 1.2em;
-            height: 1.2em;
-            vertical-align: text-bottom;
-            margin-right: 5px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .icon { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: text-bottom; margin-right: 5px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .icon-title { width: 1.4em; height: 1.4em; vertical-align: middle; stroke: #795548; margin-right: 8px; }
 
         h1 { font-size: 22px; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center; }
         
-        /* 頁籤 */
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab { flex: 1; text-align: center; padding: 12px 4px; cursor: pointer; color: var(--text-light); background-color: var(--bg-hover); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 500; font-size: 15px; transition: all 0.2s; }
         .tab.active { color: #fff; background-color: var(--text-main); border-color: var(--text-main); font-weight: 600; }
 
-        /* 輸入區塊 */
         .input-group { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; width: 100%; }
         input, select { padding: 8px 4px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
         input:focus, select:focus { border-color: #999; }
@@ -63,13 +46,11 @@
         .result-section { margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border-color); }
         .summary-box { background-color: var(--bg-hover); border: 1px solid var(--border-color); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
         
-        /* 角材 1D */
         .lumber-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
         .lumber-bar-container { flex: 1; height: 40px; background-color: var(--bg-hover); border: 2px solid var(--text-main); display: flex; position: relative; }
         .lumber-multiplier { font-weight: 600; min-width: 50px; text-align: right; color: var(--text-main); font-size: 14px; }
         .cut-piece { height: 100%; border-right: 1px solid var(--text-main); background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; white-space: nowrap; box-sizing: border-box; }
 
-        /* 板材 2D */
         .board-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-top: 20px; }
         .board-wrapper { border: 2px solid var(--text-main); background-color: var(--bg-hover); position: relative; width: 100%; box-sizing: border-box; }
         .board-piece { position: absolute; border: 1px solid var(--text-main); background-color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; box-sizing: border-box; overflow: hidden; text-align: center; padding: 2px; }
@@ -227,6 +208,7 @@
         container.appendChild(div);
     }
 
+    // 1D 角材計算
     function calculateLumber() {
         const visualContainer = document.getElementById('lumber-visuals');
         const summaryContainer = document.getElementById('lumber-summary');
@@ -303,7 +285,7 @@
     }
 
     // ==========================================
-    // 2D 板材計算邏輯 (導入推台鋸 Strip Packing 邏輯)
+    // 2D 板材計算 (全新成排預測邏輯 Row Packing Look-ahead)
     // ==========================================
     function calculateBoard(mode) {
         const visualContainer = document.getElementById('board-visuals');
@@ -316,7 +298,7 @@
         const boardH = parseFloat(boardType[1]);
         const boardName = document.getElementById('board-type').options[document.getElementById('board-type').selectedIndex].text;
         
-        const loss = 0.4; // 耗損改為 4mm
+        const loss = 0.4;
         const vBoardW = boardW + loss;
         const vBoardH = boardH + loss;
 
@@ -334,19 +316,15 @@
             
             if (l > 0 && w > 0 && qty > 0) {
                 reqSummaryText.push(`${name}(${l}x${w}) × ${qty}`);
-                
                 if (!(l <= boardW && w <= boardH) && !(w <= boardW && l <= boardH)) {
                     alert(`錯誤：「${name}」尺寸 (${l}x${w}) 超出母板最大尺寸！`);
                     hasError = true;
                 }
-
                 for (let i = 0; i < qty; i++) {
                     requests.push({ 
                         name, 
-                        originalL: Math.max(l, w), 
-                        originalW: Math.min(l, w),
-                        l: Math.max(l, w) + loss, 
-                        w: Math.min(l, w) + loss 
+                        originalL: Math.max(l, w), originalW: Math.min(l, w),
+                        l: Math.max(l, w) + loss, w: Math.min(l, w) + loss 
                     });
                 }
             }
@@ -355,19 +333,13 @@
         if(hasError) return;
         if(requests.length === 0) return alert("請輸入至少一筆有效的板材需求");
 
-        // 排序演算法優化
         if (mode === 'cuts') {
-            // 最少刀數：以最大邊優先，再以最小邊排列 (幫助系統自動找到可以組合成長條的板材)
             requests.sort((a, b) => {
-                let maxA = Math.max(a.l, a.w);
-                let maxB = Math.max(b.l, b.w);
+                let maxA = Math.max(a.l, a.w); let maxB = Math.max(b.l, b.w);
                 if (maxB !== maxA) return maxB - maxA;
-                let minA = Math.min(a.l, a.w);
-                let minB = Math.min(b.l, b.w);
-                return minB - minA;
+                return Math.min(b.l, b.w) - Math.min(a.l, a.w);
             });
         } else {
-            // 最少損料：面積優先
             requests.sort((a, b) => (b.l * b.w) - (a.l * a.w));
         }
 
@@ -380,24 +352,42 @@
                 return findNode(root.down, w, h);
             } else if ((w <= root.w && h <= root.h) || (h <= root.w && w <= root.h)) {
                 return root;
-            } else {
-                return null;
-            }
+            } else { return null; }
+        }
+
+        // 計算排滿後剩餘的縫隙 (用於成排預測)
+        function getMinGap(nodeLength, pieceLength) {
+            let count = Math.floor(nodeLength / pieceLength);
+            if (count === 0) return nodeLength;
+            let gap = nodeLength - (count * pieceLength);
+            return Math.round(gap * 100) / 100;
         }
 
         function splitNode(node, w, h, mode) {
             node.used = true;
-            
             let canFitNormal = w <= node.w && h <= node.h;
             let canFitRotated = h <= node.w && w <= node.h;
             let fitW = w, fitH = h;
             
-            // 最佳轉向判定：如果兩個方向都放得下，優先選擇能「切齊母板剩餘邊界」的方向
             if (canFitNormal && canFitRotated) {
-                if (Math.abs(w - node.w) < 0.01 || Math.abs(h - node.h) < 0.01) { fitW = w; fitH = h; }
-                else if (Math.abs(h - node.w) < 0.01 || Math.abs(w - node.h) < 0.01) { fitW = h; fitH = w; }
-                else {
-                    if ((w >= h && node.w >= node.h) || (h > w && node.h > node.w)) { fitW = w; fitH = h; }
+                // 【成排預測】計算哪種擺法能完美填滿空間，留下最小的縫隙
+                let remNormalX = getMinGap(node.w, w);
+                let remNormalY = getMinGap(node.h, h);
+                let remRotatedX = getMinGap(node.w, h);
+                let remRotatedY = getMinGap(node.h, w);
+                
+                let minGapNormal = Math.min(remNormalX, remNormalY);
+                let minGapRotated = Math.min(remRotatedX, remRotatedY);
+
+                // 優先選擇縫隙最小的 (代表最不浪費)
+                if (Math.abs(minGapNormal - minGapRotated) > 0.1) {
+                    if (minGapNormal < minGapRotated) { fitW = w; fitH = h; } 
+                    else { fitW = h; fitH = w; }
+                } else {
+                    // 如果縫隙一樣，退回選擇能留下「最大連續面積」的方向
+                    let maxRemainNormal = Math.max(node.w - w, node.h - h);
+                    let maxRemainRotated = Math.max(node.w - h, node.h - w);
+                    if (maxRemainNormal >= maxRemainRotated) { fitW = w; fitH = h; } 
                     else { fitW = h; fitH = w; }
                 }
             } else if (canFitRotated) {
@@ -407,10 +397,7 @@
             let dw = node.w - fitW;
             let dh = node.h - fitH;
 
-            // 核心修改：推台鋸切割邏輯 (Guillotine cut heuristic)
             if (mode === 'cuts') {
-                // 如果放進去的物件是「窄長型 (高 > 寬)」，我們就讓切割線一刀往下切到底 (形成垂直長條)
-                // 如果是「寬扁型 (寬 > 高)」，就一刀橫切到底 (形成水平長條)
                 if (fitW < fitH) {
                     node.down = { x: node.x, y: node.y + fitH, w: fitW, h: dh, used: false };
                     node.right = { x: node.x + fitW, y: node.y, w: dw, h: node.h, used: false };
@@ -419,7 +406,6 @@
                     node.right = { x: node.x + fitW, y: node.y, w: dw, h: fitH, used: false };
                 }
             } else {
-                // 傳統保留最大剩餘完整區塊的切法 (易產生畸零切線)
                 if (dw > dh) {
                     node.down = { x: node.x, y: node.y + fitH, w: fitW, h: dh, used: false };
                     node.right = { x: node.x + fitW, y: node.y, w: dw, h: node.h, used: false };
@@ -437,17 +423,13 @@
             for (let i = 0; i < boards.length; i++) {
                 let node = findNode(boards[i].root, req.w, req.l);
                 if (node) {
-                    let rect = splitNode(node, req.w, req.l, mode); // 傳入模式
+                    let rect = splitNode(node, req.w, req.l, mode);
                     boards[i].rects.push({ ...req, x: rect.x, y: rect.y, drawW: rect.w, drawH: rect.h });
-                    placed = true;
-                    break;
+                    placed = true; break;
                 }
             }
             if (!placed) {
-                let newBoard = {
-                    root: { x: 0, y: 0, w: vBoardW, h: vBoardH, used: false },
-                    rects: []
-                };
+                let newBoard = { root: { x: 0, y: 0, w: vBoardW, h: vBoardH, used: false }, rects: [] };
                 let node = findNode(newBoard.root, req.w, req.l);
                 let rect = splitNode(node, req.w, req.l, mode);
                 newBoard.rects.push({ ...req, x: rect.x, y: rect.y, drawW: rect.w, drawH: rect.h });
@@ -460,12 +442,8 @@
             let sigArr = board.rects.map(r => `${r.name}:${r.originalL}x${r.originalW}@${Math.round(r.x*10)}_${Math.round(r.y*10)}`);
             sigArr.sort();
             let signature = sigArr.join('|');
-
-            if (!groupedBoards[signature]) {
-                groupedBoards[signature] = { board: board, count: 1 };
-            } else {
-                groupedBoards[signature].count++;
-            }
+            if (!groupedBoards[signature]) groupedBoards[signature] = { board: board, count: 1 };
+            else groupedBoards[signature].count++;
         });
 
         let modeLabel = mode === 'cuts' ? '最少刀數 (直線長切)' : '最少損料 (面積填滿)';
@@ -488,55 +466,30 @@
         Object.values(groupedBoards).forEach(group => {
             const board = group.board;
             const count = group.count;
+            const wrapperBox = document.createElement('div'); wrapperBox.className = 'board-container-box';
+            const header = document.createElement('div'); header.className = 'board-header';
+            const label = document.createElement('div'); label.className = 'board-label'; label.innerText = `圖樣 #${displayIndex++}`;
+            const multiplier = document.createElement('div'); multiplier.className = 'board-multiplier'; multiplier.innerText = `× ${count} 張`;
+            header.appendChild(label); header.appendChild(multiplier); wrapperBox.appendChild(header);
 
-            const wrapperBox = document.createElement('div');
-            wrapperBox.className = 'board-container-box';
-            
-            const header = document.createElement('div');
-            header.className = 'board-header';
-            
-            const label = document.createElement('div');
-            label.className = 'board-label';
-            label.innerText = `圖樣 #${displayIndex++}`;
-            
-            const multiplier = document.createElement('div');
-            multiplier.className = 'board-multiplier';
-            multiplier.innerText = `× ${count} 張`;
-
-            header.appendChild(label);
-            header.appendChild(multiplier);
-            wrapperBox.appendChild(header);
-
-            const boardDiv = document.createElement('div');
-            boardDiv.className = 'board-wrapper';
-            const ratio = (boardH / boardW) * 100;
-            boardDiv.style.paddingBottom = `${ratio}%`;
+            const boardDiv = document.createElement('div'); boardDiv.className = 'board-wrapper';
+            const ratio = (boardH / boardW) * 100; boardDiv.style.paddingBottom = `${ratio}%`;
 
             board.rects.forEach(rect => {
-                const piece = document.createElement('div');
-                piece.className = 'board-piece';
-                
-                const leftPct = (rect.x / vBoardW) * 100;
-                const topPct = (rect.y / vBoardH) * 100;
-                const widthPct = ((rect.drawW - loss) / vBoardW) * 100;
-                const heightPct = ((rect.drawH - loss) / vBoardH) * 100;
-
-                piece.style.left = `${leftPct}%`;
-                piece.style.top = `${topPct}%`;
-                piece.style.width = `${widthPct}%`;
-                piece.style.height = `${heightPct}%`;
+                const piece = document.createElement('div'); piece.className = 'board-piece';
+                const leftPct = (rect.x / vBoardW) * 100; const topPct = (rect.y / vBoardH) * 100;
+                const widthPct = ((rect.drawW - loss) / vBoardW) * 100; const heightPct = ((rect.drawH - loss) / vBoardH) * 100;
+                piece.style.left = `${leftPct}%`; piece.style.top = `${topPct}%`; piece.style.width = `${widthPct}%`; piece.style.height = `${heightPct}%`;
                 
                 let isRotated = Math.abs(rect.drawW - rect.l) < 0.01;
                 let displayW = isRotated ? rect.originalL : rect.originalW;
                 let displayH = isRotated ? rect.originalW : rect.originalL;
 
-                // 移除刀距與 X/Y 座標文字
                 piece.innerHTML = `<strong>${rect.name}</strong><span style="font-size:14px; font-weight:600;">${displayW} x ${displayH}</span>`;
                 boardDiv.appendChild(piece);
             });
 
-            wrapperBox.appendChild(boardDiv);
-            visualContainer.appendChild(wrapperBox);
+            wrapperBox.appendChild(boardDiv); visualContainer.appendChild(wrapperBox);
         });
     }
 </script>
