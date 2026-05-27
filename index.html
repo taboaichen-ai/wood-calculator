@@ -93,16 +93,23 @@
             <div id="board-inputs">
                 <div class="input-group">
                     <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="板一">
-                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="169">
+                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="120">
                     <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="40">
-                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="6">
+                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="20">
                     <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
                 <div class="input-group">
                     <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="板二">
                     <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="40">
-                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="36">
-                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="15">
+                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="20">
+                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="30">
+                    <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
+                </div>
+                <div class="input-group">
+                    <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="板三">
+                    <input type="number" placeholder="長" style="flex: 1; min-width: 0;" value="120">
+                    <input type="number" placeholder="寬" style="flex: 1; min-width: 0;" value="20">
+                    <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="10">
                     <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
             </div>
@@ -163,7 +170,7 @@
             </div>
         </div>
 
-        <div id="lumber-result" class="result-section" style="display: none;">
+        <div id="board-result" class="result-section" style="display: none;">
             <h2 style="font-size: 18px; margin-top:0;">角材叫貨清單與切割圖</h2>
             <div id="lumber-summary" class="summary-box"></div>
             <div id="lumber-visuals" style="margin-top: 20px;"></div>
@@ -285,7 +292,7 @@
     }
 
     // ==========================================
-    // 2D 板材計算 (全新成排預測邏輯 Row Packing Look-ahead)
+    // 2D 板材計算 (庫存預測與保留最大面積邏輯)
     // ==========================================
     function calculateBoard(mode) {
         const visualContainer = document.getElementById('board-visuals');
@@ -333,6 +340,7 @@
         if(hasError) return;
         if(requests.length === 0) return alert("請輸入至少一筆有效的板材需求");
 
+        // 排序演算法
         if (mode === 'cuts') {
             requests.sort((a, b) => {
                 let maxA = Math.max(a.l, a.w); let maxB = Math.max(b.l, b.w);
@@ -355,40 +363,42 @@
             } else { return null; }
         }
 
-        // 計算排滿後剩餘的縫隙 (用於成排預測)
-        function getMinGap(nodeLength, pieceLength) {
-            let count = Math.floor(nodeLength / pieceLength);
-            if (count === 0) return nodeLength;
-            let gap = nodeLength - (count * pieceLength);
-            return Math.round(gap * 100) / 100;
-        }
-
-        function splitNode(node, w, h, mode) {
+        // 核心更新：庫存數量判定與最大完整面積保留法
+        function splitNode(node, req, mode, remainingQty) {
             node.used = true;
+            let w = req.w, h = req.l; 
             let canFitNormal = w <= node.w && h <= node.h;
             let canFitRotated = h <= node.w && w <= node.h;
             let fitW = w, fitH = h;
             
             if (canFitNormal && canFitRotated) {
-                // 【成排預測】計算哪種擺法能完美填滿空間，留下最小的縫隙
-                let remNormalX = getMinGap(node.w, w);
-                let remNormalY = getMinGap(node.h, h);
-                let remRotatedX = getMinGap(node.w, h);
-                let remRotatedY = getMinGap(node.h, w);
+                // 計算如果排滿，兩個方向最多能塞幾塊
+                let capNormal = Math.floor(node.w / w) * Math.floor(node.h / h);
+                let capRotated = Math.floor(node.w / h) * Math.floor(node.h / w);
                 
-                let minGapNormal = Math.min(remNormalX, remNormalY);
-                let minGapRotated = Math.min(remRotatedX, remRotatedY);
+                // 導入庫存意識：如果我手上的板子數量，根本塞不滿這個空間，就不要盲目追求高容量！
+                let countNormal = Math.min(remainingQty, capNormal);
+                let countRotated = Math.min(remainingQty, capRotated);
 
-                // 優先選擇縫隙最小的 (代表最不浪費)
-                if (Math.abs(minGapNormal - minGapRotated) > 0.1) {
-                    if (minGapNormal < minGapRotated) { fitW = w; fitH = h; } 
-                    else { fitW = h; fitH = w; }
+                if (countNormal > countRotated) {
+                    fitW = w; fitH = h;
+                } else if (countRotated > countNormal) {
+                    fitW = h; fitH = w;
                 } else {
-                    // 如果縫隙一樣，退回選擇能留下「最大連續面積」的方向
-                    let maxRemainNormal = Math.max(node.w - w, node.h - h);
-                    let maxRemainRotated = Math.max(node.w - h, node.h - w);
-                    if (maxRemainNormal >= maxRemainRotated) { fitW = w; fitH = h; } 
-                    else { fitW = h; fitH = w; }
+                    // 如果塞的數量一樣多 (或庫存不足以填滿空間)，則選擇「能留下最大塊連續餘料」的擺法
+                    let maxAreaV_N = Math.max((node.w - w) * node.h, w * (node.h - h));
+                    let maxAreaH_N = Math.max((node.w - w) * h, node.w * (node.h - h));
+                    let scoreNormal = Math.max(maxAreaV_N, maxAreaH_N);
+
+                    let maxAreaV_R = Math.max((node.w - h) * node.h, h * (node.h - w));
+                    let maxAreaH_R = Math.max((node.w - h) * w, node.w * (node.h - w));
+                    let scoreRotated = Math.max(maxAreaV_R, maxAreaH_R);
+
+                    if (scoreNormal >= scoreRotated) {
+                        fitW = w; fitH = h;
+                    } else {
+                        fitW = h; fitH = w;
+                    }
                 }
             } else if (canFitRotated) {
                 fitW = h; fitH = w;
@@ -397,7 +407,12 @@
             let dw = node.w - fitW;
             let dh = node.h - fitH;
 
+            // 切割方向判定：採用最佳面積分配 (Best Area Fit) 來避免畸零空間
+            let areaV = Math.max(dw * node.h, fitW * dh);
+            let areaH = Math.max(dw * fitH, node.w * dh);
+
             if (mode === 'cuts') {
+                // 最少刀數：強迫一刀直直切或橫橫切
                 if (fitW < fitH) {
                     node.down = { x: node.x, y: node.y + fitH, w: fitW, h: dh, used: false };
                     node.right = { x: node.x + fitW, y: node.y, w: dw, h: node.h, used: false };
@@ -406,7 +421,8 @@
                     node.right = { x: node.x + fitW, y: node.y, w: dw, h: fitH, used: false };
                 }
             } else {
-                if (dw > dh) {
+                // 最少損料：選擇能把完整空位保留最大的切法
+                if (areaV > areaH) {
                     node.down = { x: node.x, y: node.y + fitH, w: fitW, h: dh, used: false };
                     node.right = { x: node.x + fitW, y: node.y, w: dw, h: node.h, used: false };
                 } else {
@@ -418,12 +434,20 @@
             return { x: node.x, y: node.y, w: fitW, h: fitH };
         }
 
-        requests.forEach(req => {
+        requests.forEach((req, index) => {
+            // 每次排板前，盤點這種尺寸的板子還剩下幾片要排
+            let remainingQty = 0;
+            for (let j = index; j < requests.length; j++) {
+                if (requests[j].originalL === req.originalL && requests[j].originalW === req.originalW) {
+                    remainingQty++;
+                }
+            }
+
             let placed = false;
             for (let i = 0; i < boards.length; i++) {
                 let node = findNode(boards[i].root, req.w, req.l);
                 if (node) {
-                    let rect = splitNode(node, req.w, req.l, mode);
+                    let rect = splitNode(node, req, mode, remainingQty);
                     boards[i].rects.push({ ...req, x: rect.x, y: rect.y, drawW: rect.w, drawH: rect.h });
                     placed = true; break;
                 }
@@ -431,7 +455,7 @@
             if (!placed) {
                 let newBoard = { root: { x: 0, y: 0, w: vBoardW, h: vBoardH, used: false }, rects: [] };
                 let node = findNode(newBoard.root, req.w, req.l);
-                let rect = splitNode(node, req.w, req.l, mode);
+                let rect = splitNode(node, req, mode, remainingQty);
                 newBoard.rects.push({ ...req, x: rect.x, y: rect.y, drawW: rect.w, drawH: rect.h });
                 boards.push(newBoard);
             }
