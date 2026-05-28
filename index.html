@@ -234,6 +234,9 @@
         });
     }
 
+    // ==========================================
+    // MaxRectsPacker (極限排版大腦)
+    // ==========================================
     class MaxRectsPacker {
         constructor(width, height) {
             this.binWidth = width;
@@ -241,8 +244,8 @@
             this.freeRects = [{x: 0, y: 0, w: width, h: height}];
         }
 
-        insert(width, height, method, remainingQty) {
-            let newNode = this.scoreRect(width, height, method, remainingQty);
+        insert(width, height, method) {
+            let newNode = this.scoreRect(width, height, method);
             if (newNode.h === 0) return null; 
 
             let numRectanglesToProcess = this.freeRects.length;
@@ -257,15 +260,16 @@
             return newNode;
         }
 
-        scoreRect(width, height, method, remainingQty) {
+        scoreRect(width, height, method) {
             let newNode = {x: 0, y: 0, w: 0, h: 0};
             let bestScore1 = Number.MAX_VALUE;
             let bestScore2 = Number.MAX_VALUE;
+            const EPSILON = 0.001;
 
             for (let i = 0; i < this.freeRects.length; ++i) {
                 let freeRect = this.freeRects[i];
-                let canFitN = freeRect.w >= width && freeRect.h >= height;
-                let canFitR = freeRect.w >= height && freeRect.h >= width;
+                let canFitN = freeRect.w + EPSILON >= width && freeRect.h + EPSILON >= height;
+                let canFitR = freeRect.w + EPSILON >= height && freeRect.h + EPSILON >= width;
                 
                 if (!canFitN && !canFitR) continue;
 
@@ -275,24 +279,18 @@
                     let leftoverY = Math.abs(freeRect.h - h);
                     score1 = (freeRect.w * freeRect.h) - (w * h); 
                     score2 = Math.min(leftoverX, leftoverY);
-                    
-                    let cap = Math.floor(freeRect.w / w) * Math.floor(freeRect.h / h);
-                    let effCap = Math.min(cap, remainingQty);
-                    return { score1, score2, cap: effCap, w, h };
+                    return { score1, score2, w, h };
                 };
 
+                // 為了達到人類的「整體最優解」，系統在內部判斷時強制測試所有方向
                 let resN = canFitN ? tryOrient(width, height) : null;
                 let resR = canFitR ? tryOrient(height, width) : null;
                 let bestRes = null;
 
                 if (resN && resR) {
-                    if (resN.cap > resR.cap) bestRes = resN;
-                    else if (resR.cap > resN.cap) bestRes = resR;
-                    else {
-                        if (resN.score1 < resR.score1 || (resN.score1 === resR.score1 && resN.score2 < resR.score2)) {
-                            bestRes = resN;
-                        } else { bestRes = resR; }
-                    }
+                    if (resN.score1 < resR.score1 || (resN.score1 === resR.score1 && resN.score2 < resR.score2)) {
+                        bestRes = resN;
+                    } else { bestRes = resR; }
                 } else {
                     bestRes = resN || resR;
                 }
@@ -304,7 +302,15 @@
                             newNode.w = bestRes.w; newNode.h = bestRes.h;
                             bestScore1 = bestRes.score1; bestScore2 = bestRes.score2;
                         }
-                    } else {
+                    } else if (method === 'BSSF') {
+                        let shortSide = Math.min(Math.abs(freeRect.w - bestRes.w), Math.abs(freeRect.h - bestRes.h));
+                        let longSide = Math.max(Math.abs(freeRect.w - bestRes.w), Math.abs(freeRect.h - bestRes.h));
+                        if (shortSide < bestScore1 || (shortSide === bestScore1 && longSide < bestScore2)) {
+                            newNode.x = freeRect.x; newNode.y = freeRect.y;
+                            newNode.w = bestRes.w; newNode.h = bestRes.h;
+                            bestScore1 = shortSide; bestScore2 = longSide;
+                        }
+                    } else { // BL (Bottom-Left)
                         let scoreY = freeRect.y + bestRes.h;
                         let scoreX = freeRect.x + bestRes.w;
                         if (scoreY < bestScore1 || (scoreY === bestScore1 && scoreX < bestScore2)) {
@@ -319,10 +325,12 @@
         }
 
         splitFreeNode(freeNode, usedNode) {
-            if (usedNode.x >= freeNode.x + freeNode.w || usedNode.x + usedNode.w <= freeNode.x ||
-                usedNode.y >= freeNode.y + freeNode.h || usedNode.y + usedNode.h <= freeNode.y) {
+            const EPSILON = 0.001;
+            if (usedNode.x >= freeNode.x + freeNode.w - EPSILON || usedNode.x + usedNode.w <= freeNode.x + EPSILON ||
+                usedNode.y >= freeNode.y + freeNode.h - EPSILON || usedNode.y + usedNode.h <= freeNode.y + EPSILON) {
                 return false;
             }
+
             if (usedNode.x < freeNode.x + freeNode.w && usedNode.x + usedNode.w > freeNode.x) {
                 if (usedNode.y > freeNode.y && usedNode.y < freeNode.y + freeNode.h) {
                     let newNode = Object.assign({}, freeNode);
@@ -336,6 +344,7 @@
                     this.freeRects.push(newNode);
                 }
             }
+
             if (usedNode.y < freeNode.y + freeNode.h && usedNode.y + usedNode.h > freeNode.y) {
                 if (usedNode.x > freeNode.x && usedNode.x < freeNode.x + freeNode.w) {
                     let newNode = Object.assign({}, freeNode);
@@ -353,23 +362,60 @@
         }
 
         pruneFreeList() {
+            const EPSILON = 0.001;
             for (let i = 0; i < this.freeRects.length; ++i) {
                 for (let j = i + 1; j < this.freeRects.length; ++j) {
-                    if (this.isContained(this.freeRects[i], this.freeRects[j])) {
+                    let a = this.freeRects[i], b = this.freeRects[j];
+                    if (a.x >= b.x - EPSILON && a.y >= b.y - EPSILON && a.x + a.w <= b.x + b.w + EPSILON && a.y + a.h <= b.y + b.h + EPSILON) {
                         this.freeRects.splice(i, 1);
                         --i; break;
                     }
-                    if (this.isContained(this.freeRects[j], this.freeRects[i])) {
+                    if (b.x >= a.x - EPSILON && b.y >= a.y - EPSILON && b.x + b.w <= a.x + a.w + EPSILON && b.y + b.h <= a.y + a.h + EPSILON) {
                         this.freeRects.splice(j, 1);
                         --j;
                     }
                 }
             }
         }
+    }
 
-        isContained(a, b) {
-            return a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h;
+    // ==========================================
+    // 排列組合產生器 (尋找最佳進料順序)
+    // ==========================================
+    function getPermutations(arr) {
+        if (arr.length <= 1) return [arr];
+        let perms = [];
+        for (let i = 0; i < arr.length; i++) {
+            let current = arr[i];
+            let remaining = arr.slice(0, i).concat(arr.slice(i + 1));
+            let remainingPerms = getPermutations(remaining);
+            for (let j = 0; j < remainingPerms.length; j++) {
+                perms.push([current].concat(remainingPerms[j]));
+            }
         }
+        return perms;
+    }
+
+    function packWithSequence(reqArr, vBoardW, vBoardH, heuristic) {
+        let boards = [];
+        reqArr.forEach(req => {
+            let placed = false;
+            for (let i = 0; i < boards.length; i++) {
+                let placement = boards[i].packer.insert(req.w, req.l, heuristic);
+                if (placement) {
+                    boards[i].rects.push({ ...req, x: placement.x, y: placement.y, drawW: placement.w, drawH: placement.h });
+                    placed = true; break;
+                }
+            }
+            if (!placed) {
+                let packer = new MaxRectsPacker(vBoardW, vBoardH);
+                let placement = packer.insert(req.w, req.l, heuristic);
+                if (placement) {
+                    boards.push({ packer: packer, rects: [{ ...req, x: placement.x, y: placement.y, drawW: placement.w, drawH: placement.h }] });
+                }
+            }
+        });
+        return boards;
     }
 
     function calculateBoard(mode) {
@@ -389,8 +435,11 @@
         let requests = [];
         let reqSummaryText = [];
         let hasError = false;
-        let totalNeededArea = 0; // 統計需求真實面積
+        let totalNeededArea = 0; 
         
+        // 記錄有幾種不同的板材尺寸 (用來分組)
+        let groups = {};
+
         const rows = document.querySelectorAll('#board-inputs .input-group');
         rows.forEach(row => {
             const inputs = row.querySelectorAll('input');
@@ -405,13 +454,19 @@
                     alert(`錯誤：「${name}」尺寸 (${l}x${w}) 超出母板最大尺寸！`);
                     hasError = true;
                 }
+                
+                let key = `${Math.max(l,w)}x${Math.min(l,w)}`;
+                if(!groups[key]) groups[key] = [];
+
                 for (let i = 0; i < qty; i++) {
-                    totalNeededArea += (l * w); // 累加面積
-                    requests.push({ 
+                    totalNeededArea += (l * w); 
+                    let item = { 
                         name, 
                         originalL: Math.max(l, w), originalW: Math.min(l, w),
                         l: Math.max(l, w) + loss, w: Math.min(l, w) + loss 
-                    });
+                    };
+                    requests.push(item);
+                    groups[key].push(item);
                 }
             }
         });
@@ -419,44 +474,58 @@
         if(hasError) return;
         if(requests.length === 0) return alert("請輸入至少一筆有效的板材需求");
 
-        if (mode === 'cuts') {
-            requests.sort((a, b) => Math.max(b.l, b.w) - Math.max(a.l, a.w) || (b.l * b.w) - (a.l * a.w));
+        // 核心突破：產生不同的進料順序陣列
+        let requestArraysToTest = [];
+        let groupKeys = Object.keys(groups);
+        
+        if (groupKeys.length <= 5) {
+            // 如果種類不多，產生所有排列組合，絕對能抓到人類直覺的最佳解！
+            let perms = getPermutations(groupKeys);
+            perms.forEach(perm => {
+                let arr = [];
+                perm.forEach(key => { arr = arr.concat(groups[key]); });
+                requestArraysToTest.push(arr);
+            });
         } else {
-            requests.sort((a, b) => (b.l * b.w) - (a.l * a.w) || Math.max(b.l, b.w) - Math.max(a.l, a.w));
+            // 種類太多時退回傳統排序
+            requestArraysToTest.push([...requests].sort((a, b) => (b.l * b.w) - (a.l * a.w)));
+            requestArraysToTest.push([...requests].sort((a, b) => Math.max(b.l, b.w) - Math.max(a.l, a.w)));
         }
 
-        let boards = [];
+        let finalBoards = null;
+        let minBoardCount = Number.MAX_VALUE;
+        let maxContiguousFreeArea = -1;
+        let finalHeuristicName = '';
+        
+        // 讓各種順序與各種演算法互相競爭
+        let heuristics = mode === 'cuts' ? ['BL'] : ['BAF', 'BSSF'];
 
-        requests.forEach((req, index) => {
-            let remainingQty = 0;
-            for (let j = index; j < requests.length; j++) {
-                if (requests[j].originalL === req.originalL && requests[j].originalW === req.originalW) {
-                    remainingQty++;
+        requestArraysToTest.forEach(reqArr => {
+            heuristics.forEach(h => {
+                let candidateBoards = packWithSequence(reqArr, vBoardW, vBoardH, h);
+                let currentBoardCount = candidateBoards.length;
+                
+                let currentMaxFree = 0;
+                let lastPacker = candidateBoards[candidateBoards.length - 1].packer;
+                if(lastPacker && lastPacker.freeRects) {
+                    lastPacker.freeRects.forEach(fr => {
+                        let area = fr.w * fr.h;
+                        if (area > currentMaxFree) currentMaxFree = area;
+                    });
                 }
-            }
 
-            let placed = false;
-            for (let i = 0; i < boards.length; i++) {
-                let packer = boards[i].packer;
-                let placement = packer.insert(req.w, req.l, mode === 'cuts' ? 'BL' : 'BAF', remainingQty);
-                if (placement) {
-                    boards[i].rects.push({ ...req, x: placement.x, y: placement.y, drawW: placement.w, drawH: placement.h });
-                    placed = true; break;
+                // 挑選條件：最少板子 -> 最後一張板子剩下的單塊空間最大 (最完整)
+                if (currentBoardCount < minBoardCount || (currentBoardCount === minBoardCount && currentMaxFree > maxContiguousFreeArea)) {
+                    minBoardCount = currentBoardCount;
+                    maxContiguousFreeArea = currentMaxFree;
+                    finalBoards = candidateBoards;
+                    finalHeuristicName = h === 'BAF' ? '最佳面積適應' : (h === 'BSSF' ? '最佳短邊適應' : '左下角疊磚');
                 }
-            }
-            if (!placed) {
-                let packer = new MaxRectsPacker(vBoardW, vBoardH);
-                let placement = packer.insert(req.w, req.l, mode === 'cuts' ? 'BL' : 'BAF', remainingQty);
-                if (placement) {
-                    let newBoard = { packer: packer, rects: [] };
-                    newBoard.rects.push({ ...req, x: placement.x, y: placement.y, drawW: placement.w, drawH: placement.h });
-                    boards.push(newBoard);
-                }
-            }
+            });
         });
 
         let groupedBoards = {};
-        boards.forEach(board => {
+        finalBoards.forEach(board => {
             let sigArr = board.rects.map(r => `${r.name}:${r.originalL}x${r.originalW}@${Math.round(r.x*10)}_${Math.round(r.y*10)}`);
             sigArr.sort();
             let signature = sigArr.join('|');
@@ -464,11 +533,10 @@
             else groupedBoards[signature].count++;
         });
 
-        // 結算板材利用率
-        let totalBoardArea = boards.length * boardW * boardH;
+        let totalBoardArea = finalBoards.length * boardW * boardH;
         let utilizationRate = ((totalNeededArea / totalBoardArea) * 100).toFixed(1);
 
-        let modeLabel = mode === 'cuts' ? '最少刀數 (直線排列/左下角法則)' : '最少損料 (最大矩形)';
+        let modeLabel = mode === 'cuts' ? '最少刀數 (AI 推演左下角)' : `最少損料 (AI 推演: ${finalHeuristicName})`;
         let modeColor = mode === 'cuts' ? '#1976d2' : '#2e7d32'; 
         let rulerIcon = `<svg class="icon" viewBox="0 0 24 24" style="margin-right: 8px;"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg>`;
 
@@ -482,7 +550,7 @@
             需求：${reqSummaryText.join('、')}<br>
             <br>
             <div style="display:flex; justify-content: space-between; align-items:flex-end;">
-                <strong style="font-size:16px; color:#d32f2f;">總共需叫貨： ${boards.length} 張${boardName}</strong>
+                <strong style="font-size:16px; color:#d32f2f;">總共需叫貨： ${finalBoards.length} 張${boardName}</strong>
                 <span style="font-size:14px; font-weight:600; color:#555; background:#eee; padding:4px 8px; border-radius:4px;">📊 淨面積利用率: ${utilizationRate}%</span>
             </div>
         `;
