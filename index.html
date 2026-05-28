@@ -5,66 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>木工裁切視覺化計算板</title>
     <style>
-        /* 白底極簡風設計 */
-        :root {
-            --border-color: #e5e5e5;
-            --text-main: #333333;
-            --text-light: #888888;
-            --bg-hover: #fafafa;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            color: var(--text-main);
-            margin: 0;
-            padding: 15px;
-            line-height: 1.5;
-        }
+        :root { --border-color: #e5e5e5; --text-main: #333333; --text-light: #888888; --bg-hover: #fafafa; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; color: var(--text-main); margin: 0; padding: 15px; line-height: 1.5; }
         .container { max-width: 900px; margin: 0 auto; }
-        
         .icon { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: text-bottom; margin-right: 5px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .icon-title { width: 1.4em; height: 1.4em; vertical-align: middle; stroke: #795548; margin-right: 8px; }
-
         h1 { font-size: 22px; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center; }
-        
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab { flex: 1; text-align: center; padding: 12px 4px; cursor: pointer; color: var(--text-light); background-color: var(--bg-hover); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 500; font-size: 15px; transition: all 0.2s; }
         .tab.active { color: #fff; background-color: var(--text-main); border-color: var(--text-main); font-weight: 600; }
-
         .input-group { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; width: 100%; }
         input, select { padding: 8px 4px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
         input:focus, select:focus { border-color: #999; }
         button { background-color: #fff; color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.2s; white-space: nowrap; display: flex; align-items: center; justify-content: center; }
         button:hover { background-color: var(--bg-hover); }
-        
         .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
         .btn-primary { background-color: var(--text-main); color: #fff; border: none; font-weight: 600;}
         .btn-green { background-color: #2e7d32; color: #fff; border: none; font-weight: 600;}
         .btn-blue { background-color: #1976d2; color: #fff; border: none; font-weight: 600;}
         .btn-delete { padding: 8px; flex-shrink: 0; color: #d32f2f; border-color: #e5e5e5; }
-
         .result-section { margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border-color); }
         .summary-box { background-color: var(--bg-hover); border: 1px solid var(--border-color); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
-        
         .lumber-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
         .lumber-bar-container { flex: 1; height: 40px; background-color: var(--bg-hover); border: 2px solid var(--text-main); display: flex; position: relative; }
         .lumber-multiplier { font-weight: 600; min-width: 50px; text-align: right; color: var(--text-main); font-size: 14px; }
         .cut-piece { height: 100%; border-right: 1px solid var(--text-main); background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; white-space: nowrap; box-sizing: border-box; }
-
         .board-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-top: 20px; }
         .board-wrapper { border: 2px solid var(--text-main); background-color: var(--bg-hover); position: relative; width: 100%; box-sizing: border-box; }
         .board-piece { position: absolute; border: 1px solid var(--text-main); background-color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; box-sizing: border-box; overflow: hidden; text-align: center; padding: 2px; }
         .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
         .board-label { font-weight: 600; font-size: 15px; }
         .board-multiplier { font-weight: bold; font-size: 15px; color: #d32f2f; }
-
-        @media print {
-            .no-print { display: none !important; }
-            body { padding: 0; }
-            .container { max-width: 100%; }
-            .board-container-box { page-break-inside: avoid; break-inside: avoid; margin-bottom: 40px !important; }
-            .lumber-row { page-break-inside: avoid; break-inside: avoid; }
-        }
+        @media print { .no-print { display: none !important; } body { padding: 0; } .container { max-width: 100%; } .board-container-box { page-break-inside: avoid; break-inside: avoid; margin-bottom: 40px !important; } .lumber-row { page-break-inside: avoid; break-inside: avoid; } }
     </style>
 </head>
 <body>
@@ -130,7 +102,6 @@
                 </button>
             </div>
         </div>
-
         <div id="board-result" class="result-section" style="display: none;">
             <h2 style="font-size: 18px; margin-top:0;">板材切割圖紙</h2>
             <div id="board-summary" class="summary-box"></div>
@@ -147,7 +118,6 @@
                 </select>
                 <div style="font-size: 12px; color: var(--text-light);">*每次切割自動扣除 3mm 鋸片損耗</div>
             </div>
-
             <div id="lumber-inputs">
                 <div class="input-group">
                     <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;" value="主結構">
@@ -156,27 +126,18 @@
                     <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
                 </div>
             </div>
-
             <div class="action-buttons">
                 <button onclick="addInputRow('lumber-inputs', false)" style="flex: 1;">+ 新增</button>
-                <button class="btn-primary" onclick="calculateLumber()" style="flex: 2;">
-                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line></svg>
-                    開始計算
-                </button>
-                <button onclick="window.print()" style="flex: 1;">
-                    <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                    列印
-                </button>
+                <button class="btn-primary" onclick="calculateLumber()" style="flex: 2;">開始計算</button>
+                <button onclick="window.print()" style="flex: 1;">列印</button>
             </div>
         </div>
-
         <div id="lumber-result" class="result-section" style="display: none;">
             <h2 style="font-size: 18px; margin-top:0;">角材叫貨清單與切割圖</h2>
             <div id="lumber-summary" class="summary-box"></div>
             <div id="lumber-visuals" style="margin-top: 20px;"></div>
         </div>
     </div>
-
 </div>
 
 <script>
@@ -197,27 +158,13 @@
         const div = document.createElement('div');
         div.className = 'input-group';
         if(isBoard) {
-            div.innerHTML = `
-                <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;">
-                <input type="number" placeholder="長" style="flex: 1; min-width: 0;">
-                <input type="number" placeholder="寬" style="flex: 1; min-width: 0;">
-                <input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="1">
-                <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
-            `;
+            div.innerHTML = `<input type="text" placeholder="名稱" style="flex: 2; min-width: 0;"><input type="number" placeholder="長" style="flex: 1; min-width: 0;"><input type="number" placeholder="寬" style="flex: 1; min-width: 0;"><input type="number" placeholder="數量" style="flex: 1.2; min-width: 0;" value="1"><button class="btn-delete" onclick="this.parentElement.remove()">✕</button>`;
         } else {
-            div.innerHTML = `
-                <input type="text" placeholder="名稱" style="flex: 2; min-width: 0;">
-                <input type="number" placeholder="長度" style="flex: 1.5; min-width: 0;">
-                <input type="number" placeholder="數量" style="flex: 1; min-width: 0;" value="1">
-                <button class="btn-delete" onclick="this.parentElement.remove()">✕</button>
-            `;
+            div.innerHTML = `<input type="text" placeholder="名稱" style="flex: 2; min-width: 0;"><input type="number" placeholder="長度" style="flex: 1.5; min-width: 0;"><input type="number" placeholder="數量" style="flex: 1; min-width: 0;" value="1"><button class="btn-delete" onclick="this.parentElement.remove()">✕</button>`;
         }
         container.appendChild(div);
     }
 
-    // ==========================================
-    // 1D 角材計算
-    // ==========================================
     function calculateLumber() {
         const visualContainer = document.getElementById('lumber-visuals');
         const summaryContainer = document.getElementById('lumber-summary');
@@ -294,135 +241,114 @@
     }
 
     // ==========================================
-    // 2D 板材計算 - 導入國際工業標準 MaxRects 演算法 (最大矩形演算法)
+    // 2D 板材計算 (層架演算法 Shelf Packing - 保證整齊長條)
     // ==========================================
-    class MaxRectsPacker {
+    class ShelfPacker {
         constructor(width, height) {
-            this.binWidth = width;
-            this.binHeight = height;
-            // 初始化時，整張母板就是一個最大的完整空間
+            this.binW = width;
+            this.binH = height;
+            this.shelves = [];
+            this.totalH = 0;
+        }
+
+        insert(w, h) {
+            let bestShelf = -1;
+            let bestFit = null;
+            let minWaste = Number.MAX_VALUE;
+
+            // 尋找能完美符合「高度」的既有層架
+            const tryFit = (itemW, itemH) => {
+                for (let i = 0; i < this.shelves.length; i++) {
+                    let s = this.shelves[i];
+                    if (itemW <= s.freeW && itemH <= s.h) {
+                        let waste = s.h - itemH;
+                        // 極度偏好高度完美的層架 (確保直線無誤差)
+                        if (waste < minWaste) {
+                            minWaste = waste;
+                            bestShelf = i;
+                            bestFit = {w: itemW, h: itemH};
+                        }
+                    }
+                }
+            };
+
+            tryFit(w, h);
+            tryFit(h, w);
+
+            // 放得進現有層架
+            if (bestShelf !== -1) {
+                let s = this.shelves[bestShelf];
+                let res = {x: s.x, y: s.y, w: bestFit.w, h: bestFit.h};
+                s.x += bestFit.w;
+                s.freeW -= bestFit.w;
+                return res;
+            }
+
+            // 放不進去，嘗試開啟新的層架
+            let canFitN = (this.totalH + h <= this.binH && w <= this.binW);
+            let canFitR = (this.totalH + w <= this.binH && h <= this.binW);
+            let useW = w, useH = h;
+
+            if (canFitN && canFitR) {
+                // 如果兩邊都放得下，優先將長邊橫放，利於後續相同板材並排
+                if (h < w) { useW = w; useH = h; }
+                else { useW = h; useH = w; }
+            } else if (canFitR) {
+                useW = h; useH = w;
+            } else if (!canFitN) {
+                return null; // 超出板子範圍，塞不下
+            }
+
+            let newShelf = {
+                x: useW,
+                y: this.totalH,
+                h: useH,
+                freeW: this.binW - useW
+            };
+            this.shelves.push(newShelf);
+            this.totalH += useH;
+            
+            return {x: 0, y: newShelf.y, w: useW, h: useH};
+        }
+    }
+
+    // (保留最少損料所使用的 GuillotinePacker，擅長處理非整齊尺寸)
+    class GuillotinePacker {
+        constructor(width, height) {
             this.freeRects = [{x: 0, y: 0, w: width, h: height}];
         }
-
-        insert(width, height, method) {
-            let newNode = this.scoreRect(width, height, method);
-            if (newNode.h === 0) return null; // 找不到夠大的空間就拒絕
-
-            // 當板子放入後，將所有被遮擋到的剩餘空間進行重新計算與分割
-            let numRectanglesToProcess = this.freeRects.length;
-            for (let i = 0; i < numRectanglesToProcess; ++i) {
-                if (this.splitFreeNode(this.freeRects[i], newNode)) {
-                    this.freeRects.splice(i, 1);
-                    --i;
-                    --numRectanglesToProcess;
-                }
-            }
-
-            // 清除被包覆的無用空間，保持系統清爽與精準
-            this.pruneFreeList();
-            return newNode;
-        }
-
-        scoreRect(width, height, method) {
-            let newNode = {x: 0, y: 0, w: 0, h: 0};
-            let bestScore1 = Number.MAX_VALUE;
-            let bestScore2 = Number.MAX_VALUE;
-
+        insert(width, height) {
+            let bestNodeIndex = -1; let bestNode = {x:0, y:0, w:0, h:0};
+            let bestScore = Number.MAX_VALUE;
             for (let i = 0; i < this.freeRects.length; ++i) {
-                let freeRect = this.freeRects[i];
-                
-                // 嘗試【不轉向】塞入
-                if (freeRect.w >= width && freeRect.h >= height) {
-                    let score = this.calculateScore(freeRect, width, height, method);
-                    if (score.score1 < bestScore1 || (score.score1 === bestScore1 && score.score2 < bestScore2)) {
-                        newNode.x = freeRect.x; newNode.y = freeRect.y;
-                        newNode.w = width; newNode.h = height;
-                        bestScore1 = score.score1; bestScore2 = score.score2;
-                    }
+                let f = this.freeRects[i];
+                if (width <= f.w && height <= f.h) {
+                    let score = (f.w * f.h) - (width * height);
+                    if (score < bestScore) { bestNode.x=f.x; bestNode.y=f.y; bestNode.w=width; bestNode.h=height; bestScore=score; bestNodeIndex=i; }
                 }
-                // 嘗試【轉向 90 度】塞入
-                if (freeRect.w >= height && freeRect.h >= width) {
-                    let score = this.calculateScore(freeRect, height, width, method);
-                    if (score.score1 < bestScore1 || (score.score1 === bestScore1 && score.score2 < bestScore2)) {
-                        newNode.x = freeRect.x; newNode.y = freeRect.y;
-                        newNode.w = height; newNode.h = width;
-                        bestScore1 = score.score1; bestScore2 = score.score2;
-                    }
+                if (height <= f.w && width <= f.h) {
+                    let score = (f.w * f.h) - (width * height);
+                    if (score < bestScore) { bestNode.x=f.x; bestNode.y=f.y; bestNode.w=height; bestNode.h=width; bestScore=score; bestNodeIndex=i; }
                 }
             }
-            return newNode;
+            if (bestNodeIndex === -1) return null;
+            this.split(this.freeRects[bestNodeIndex], bestNode);
+            this.freeRects.splice(bestNodeIndex, 1);
+            return bestNode;
         }
-
-        calculateScore(freeRect, width, height, method) {
-            let leftoverX = Math.abs(freeRect.w - width);
-            let leftoverY = Math.abs(freeRect.h - height);
-            if (method === 'BAF') { 
-                // BAF (Best Area Fit) 最少損料模式：極大化剩餘空間的完整性
-                return { score1: (freeRect.w * freeRect.h) - (width * height), score2: Math.min(leftoverX, leftoverY) };
-            } else { 
-                // BSSF (Best Short Side Fit) 最少刀數模式：優先貼齊短邊，利於創造整齊的直線裁切
-                return { score1: Math.min(leftoverX, leftoverY), score2: Math.max(leftoverX, leftoverY) };
+        split(f, u) {
+            let w = f.w - u.w; let h = f.h - u.h;
+            let splitH = (f.w * h <= w * f.h);
+            let n1 = {x:0,y:0,w:0,h:0}, n2 = {x:0,y:0,w:0,h:0};
+            if (splitH) {
+                n1 = {x: f.x, y: f.y + u.h, w: f.w, h: h};
+                n2 = {x: f.x + u.w, y: f.y, w: w, h: u.h};
+            } else {
+                n1 = {x: f.x, y: f.y + u.h, w: u.w, h: h};
+                n2 = {x: f.x + u.w, y: f.y, w: w, h: f.h};
             }
-        }
-
-        // 取代一刀切：精準算出所有的可用重疊空白區域
-        splitFreeNode(freeNode, usedNode) {
-            // 檢查是否重疊
-            if (usedNode.x >= freeNode.x + freeNode.w || usedNode.x + usedNode.w <= freeNode.x ||
-                usedNode.y >= freeNode.y + freeNode.h || usedNode.y + usedNode.h <= freeNode.y) {
-                return false;
-            }
-
-            // 產生上方/下方的新空白區域
-            if (usedNode.x < freeNode.x + freeNode.w && usedNode.x + usedNode.w > freeNode.x) {
-                if (usedNode.y > freeNode.y && usedNode.y < freeNode.y + freeNode.h) {
-                    let newNode = Object.assign({}, freeNode);
-                    newNode.h = usedNode.y - newNode.y;
-                    this.freeRects.push(newNode);
-                }
-                if (usedNode.y + usedNode.h < freeNode.y + freeNode.h) {
-                    let newNode = Object.assign({}, freeNode);
-                    newNode.y = usedNode.y + usedNode.h;
-                    newNode.h = freeNode.y + freeNode.h - (usedNode.y + usedNode.h);
-                    this.freeRects.push(newNode);
-                }
-            }
-
-            // 產生左方/右方的新空白區域
-            if (usedNode.y < freeNode.y + freeNode.h && usedNode.y + usedNode.h > freeNode.y) {
-                if (usedNode.x > freeNode.x && usedNode.x < freeNode.x + freeNode.w) {
-                    let newNode = Object.assign({}, freeNode);
-                    newNode.w = usedNode.x - newNode.x;
-                    this.freeRects.push(newNode);
-                }
-                if (usedNode.x + usedNode.w < freeNode.x + freeNode.w) {
-                    let newNode = Object.assign({}, freeNode);
-                    newNode.x = usedNode.x + usedNode.w;
-                    newNode.w = freeNode.x + freeNode.w - (usedNode.x + usedNode.w);
-                    this.freeRects.push(newNode);
-                }
-            }
-            return true;
-        }
-
-        pruneFreeList() {
-            // 移除被其他大空白矩形完全包覆的小矩形，確保運算效率與邏輯正確
-            for (let i = 0; i < this.freeRects.length; ++i) {
-                for (let j = i + 1; j < this.freeRects.length; ++j) {
-                    if (this.isContained(this.freeRects[i], this.freeRects[j])) {
-                        this.freeRects.splice(i, 1);
-                        --i; break;
-                    }
-                    if (this.isContained(this.freeRects[j], this.freeRects[i])) {
-                        this.freeRects.splice(j, 1);
-                        --j;
-                    }
-                }
-            }
-        }
-
-        isContained(a, b) {
-            return a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h;
+            if (n1.w > 0 && n1.h > 0) this.freeRects.push(n1);
+            if (n2.w > 0 && n2.h > 0) this.freeRects.push(n2);
         }
     }
 
@@ -436,7 +362,7 @@
         const boardH = parseFloat(boardType[1]);
         const boardName = document.getElementById('board-type').options[document.getElementById('board-type').selectedIndex].text;
         
-        const loss = 0.4; // 耗損 4mm
+        const loss = 0.4;
         const vBoardW = boardW + loss;
         const vBoardH = boardH + loss;
 
@@ -471,36 +397,30 @@
         if(hasError) return;
         if(requests.length === 0) return alert("請輸入至少一筆有效的板材需求");
 
-        // 將板材依據面積大小排序，大塊的優先塞入能獲得最佳版面配置
+        // 依據面積與最大邊進行排序，確保演算法能順利堆疊
         if (mode === 'cuts') {
-            requests.sort((a, b) => {
-                let maxA = Math.max(a.l, a.w); let maxB = Math.max(b.l, b.w);
-                if (maxB !== maxA) return maxB - maxA;
-                return Math.min(b.l, b.w) - Math.min(a.l, a.w);
-            });
+            requests.sort((a, b) => Math.max(b.l, b.w) - Math.max(a.l, a.w) || (b.l * b.w) - (a.l * a.w));
         } else {
-            // MaxRects 搭配面積遞減排序，能達到幾乎 100% 完美的利用率
-            requests.sort((a, b) => (b.l * b.w) - (a.l * a.w) || Math.max(b.l, b.w) - Math.max(a.l, a.w));
+            requests.sort((a, b) => (b.l * b.w) - (a.l * a.w));
         }
 
         let boards = [];
 
         requests.forEach(req => {
             let placed = false;
-            // 嘗試塞入現有的母板
             for (let i = 0; i < boards.length; i++) {
                 let packer = boards[i].packer;
-                let placement = packer.insert(req.w, req.l, mode === 'cuts' ? 'BSSF' : 'BAF');
+                let placement = packer.insert(req.w, req.l);
                 
                 if (placement) {
                     boards[i].rects.push({ ...req, x: placement.x, y: placement.y, drawW: placement.w, drawH: placement.h });
                     placed = true; break;
                 }
             }
-            // 如果所有板子都塞不下，開啟一張全新的四八板
             if (!placed) {
-                let packer = new MaxRectsPacker(vBoardW, vBoardH);
-                let placement = packer.insert(req.w, req.l, mode === 'cuts' ? 'BSSF' : 'BAF');
+                // 根據按鈕模式，實例化不同的裁切大腦
+                let packer = mode === 'cuts' ? new ShelfPacker(vBoardW, vBoardH) : new GuillotinePacker(vBoardW, vBoardH);
+                let placement = packer.insert(req.w, req.l);
                 if (placement) {
                     let newBoard = { packer: packer, rects: [] };
                     newBoard.rects.push({ ...req, x: placement.x, y: placement.y, drawW: placement.w, drawH: placement.h });
@@ -518,7 +438,7 @@
             else groupedBoards[signature].count++;
         });
 
-        let modeLabel = mode === 'cuts' ? '最少刀數 (直線排列)' : '最少損料 (最大矩形)';
+        let modeLabel = mode === 'cuts' ? '最少刀數 (層架式整齊長切)' : '最少損料 (最大完整餘料)';
         let modeColor = mode === 'cuts' ? '#1976d2' : '#2e7d32'; 
         let rulerIcon = `<svg class="icon" viewBox="0 0 24 24" style="margin-right: 8px;"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg>`;
 
